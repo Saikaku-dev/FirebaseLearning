@@ -9,24 +9,50 @@ import SwiftUI
 
 struct UploadDataTestView: View {
     @StateObject private var ctl = UploadTextManager()
+    @StateObject private var imgctl = UploadImageManager()
     @State private var inpuText = ""
+    @State private var image:UIImage?
+    @State private var showLibrary:Bool = false
     
     var body: some View {
-        HStack {
+        VStack {
+            if let img = image {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100)
+            }
+            
+            Button {
+                showLibrary = true
+            } label: {
+                Text("写真を選ぶ")
+            }.padding(.bottom)
+            
             TextField("テキスト",text:$inpuText)
                 .background(Color(.systemGray6))
                 .frame(width:200)
+                .padding(.bottom)
             Button {
-                //upload text
-                ctl.saveText(text: inpuText) { success in
+                ctl.uploadText(text: inpuText) { success in
                     if success {
                         inpuText = ""
                         print("Data saved successfully")
                     }
                 }
+                if let image = image {
+                    imgctl.uploadImage(image: image) { urlString in
+                        print(urlString ?? "Empty")
+                    }
+                }
+                
             } label: {
                 Text("upload")
             }
+        }
+        .sheet(isPresented: $showLibrary) {
+            PhotoLibraryManager(image: $image)
+                .ignoresSafeArea()
         }
         .onAppear() {
             ctl.loadText { savedMsg in

@@ -9,7 +9,7 @@ import FirebaseFirestore
 
 class UploadTextManager:ObservableObject {
     
-    func saveText(text: String, completation: @escaping(Bool) -> Void) {
+    func uploadText(text: String, completation: @escaping(Bool) -> Void) {
         let db = Firestore.firestore()
         
         db.collection("Collection").document("Text").setData(["message": text]) { error in
